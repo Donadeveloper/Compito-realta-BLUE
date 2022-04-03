@@ -435,7 +435,7 @@ void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID)   
         std::cout << "|" << listaDati[pos_ID].des_auto << "\t" << std::endl;
 }
 
-void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID)    // funzione chemostra tutti i dati inerenti all'ID persona cercato
+void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID)    // funzione che mostra tutti i dati inerenti all'ID persona cercato
 {
     std::vector<datiRimborso>ID_cercato;                                            //creo un vector temporaneo per salvare tutti i dati appartenenti all'IDPersona cercato
     for(int i=0;i<listaDati.size();i++)
