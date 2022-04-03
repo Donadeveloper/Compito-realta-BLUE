@@ -15,7 +15,7 @@ Questi dati verranno presi da una struttura dati di tipo fstream impostata come 
 
 1) void caricamentoDati (vector<struct> &listaDati, fstream inputFile)
 
-La funzione caricamentoDati prende dal file della stream inputFile i dati necessari, poi li carica nel vector listaDati passato come riferimento.
+La funzione caricamentoDati prende dal file della stream inputFile i dati necessari per poi caricarli nel vector listaDati passato come riferimento.
 
 
 2) void ordinaDati (vector<struct> &listaDati)
