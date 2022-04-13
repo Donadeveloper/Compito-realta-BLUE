@@ -22,13 +22,17 @@ void ordinamentoDati(std::vector<datiRimborso>& listaDati);
 void inserimentoDati(std::vector<datiRimborso>& listaDati);
 int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato);
 int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato);
-void mostramenu();
+void mostramenu(std::vector<datiRimborso> listaDati);
 void mostraDati(std::vector<datiRimborso> listaDati);
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
 void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID);
 
-void mostramenu()
+void mostramenu(std::vector<datiRimborso> listaDati)
 {
+    unsigned int scelta;
+    unsigned int IDcercato;
+    unsigned int IDtrovato;
+
     std::cout << "\n\n\t\t------RIMBORSO AUTO------\n";
     std::cout << "\n\tBenvenuto nella gestione dei rimborsi auto cosa vuoi fare?:\n";
     std::cout << "\t [1]  Inserire un rimborso\n";
@@ -38,6 +42,46 @@ void mostramenu()
     std::cout << "\t [5]  Mostrare i rimborsi presenti nel database dei rimborsi\n";
     std::cout << "\t [6]  Salvataggio \n";
     std::cout << "\t [7]  ESC\n";
+
+    std::cout << "\n n scelta: ";
+    std::cin >> scelta;
+
+    switch(scelta)
+    {
+    case 1:
+        inserimentoDati(listaDati);
+        break;
+    case 2:
+        std::cout << "Inserisci l'ID dell'auto che vuoi cercare:  ";
+        std::cin >> IDcercato;
+        IDtrovato = ricercaIdAuto(listaDati, IDcercato);
+        if (IDtrovato!=-1)
+            mostra_per_IDAuto(listaDati,IDtrovato);
+        else
+            std::cout << "non presente\n";
+        break;
+    case 3:
+        std::cout << "Inserisci l'ID della persona che vuoi cercare:  ";
+        std::cin >> IDcercato;
+        IDtrovato = ricercaIdPersona(listaDati, IDcercato);
+        if (IDtrovato!=-1)
+            mostra_per_IDPersona(listaDati,IDtrovato);
+        else
+            std::cout << "non presente\n";
+        break;
+    case 4:
+        break;
+    case 5:
+        mostraDati(listaDati);
+        break;
+    case 6:
+        break;
+    case 7:
+        return;
+    }
+    system("pause");
+    system("cls");
+    mostramenu();
 }
 
 void mostraDati(std::vector<datiRimborso>listaDati) {
@@ -364,7 +408,7 @@ void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID)   
             "----------------------------------------------------------------------------------------------------------------\n";
 
         std::cout << "|" << listaDati[pos_ID].idPersona << "\t";
-        if (listaDati[pos_ID].idPersona < 1000000) 
+        if (listaDati[pos_ID].idPersona < 1000000)
             std::cout << "\t";  // Se l'id persona non supera il milione stampo un altro tab (causa formattazione della tabella)
         std::cout << "|" << listaDati[pos_ID].idAuto << "\t\t";
         std::cout << "|" << listaDati[pos_ID].targa_Auto << "\t";

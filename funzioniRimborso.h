@@ -22,7 +22,7 @@ void ordinamentoDati(std::vector<datiRimborso>& listaDati);
 void inserimentoDati(std::vector<datiRimborso>& listaDati);
 int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato);
 int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato);
-void mostramenu();
+void mostramenu(std::vector<datiRimborso> listaDati);
 void mostraDati(std::vector<datiRimborso> listaDati);
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
 void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID);
