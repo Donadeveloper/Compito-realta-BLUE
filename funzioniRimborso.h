@@ -15,14 +15,15 @@ struct datiRimborso {
     long long int km_rimborso;
 };
 
-void caricamentoDati(std::vector<datiRimborso>& listaDati, std::fstream& inputFile);
+void caricamentoDati(std::vector<datiRimborso>& listaDati, std::fstream &inputFile);
 int stringToInt(std::string);
 double stringToDouble(std::string);
 void ordinamentoDati(std::vector<datiRimborso>& listaDati);
 void inserimentoDati(std::vector<datiRimborso>& listaDati);
 int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato);
 int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato);
-void mostramenu(std::vector<datiRimborso> listaDati);
+void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati);
 void mostraDati(std::vector<datiRimborso> listaDati);
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
 void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID);
+void caricaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);

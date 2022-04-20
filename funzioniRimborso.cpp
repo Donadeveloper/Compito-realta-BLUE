@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <locale>
 
 struct datiRimborso {
 
@@ -15,6 +16,7 @@ struct datiRimborso {
     long long int km_rimborso;
 };
 
+
 void caricamentoDati(std::vector<datiRimborso>& listaDati, std::fstream& inputFile);
 int stringToInt(std::string);
 double stringToDouble(std::string);
@@ -22,12 +24,13 @@ void ordinamentoDati(std::vector<datiRimborso>& listaDati);
 void inserimentoDati(std::vector<datiRimborso>& listaDati);
 int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato);
 int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato);
-void mostramenu(std::vector<datiRimborso> listaDati);
+void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati);
 void mostraDati(std::vector<datiRimborso> listaDati);
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
 void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID);
+void caricaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);
 
-void mostramenu(std::vector<datiRimborso> listaDati)
+void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati)
 {
     unsigned int scelta;
     unsigned int IDcercato;
@@ -40,7 +43,7 @@ void mostramenu(std::vector<datiRimborso> listaDati)
     std::cout << "\t [3]  Ricercare una persona presente nel database dei rimborsi\n";
     std::cout << "\t [4]  Rimuovere un rimborso presente nel database dei rimborsi\n";
     std::cout << "\t [5]  Mostrare i rimborsi presenti nel database dei rimborsi\n";
-    std::cout << "\t [6]  Salvataggio \n";
+    std::cout << "\t [6]  Salvataggio modifiche\n";
     std::cout << "\t [7]  ESC\n";
 
     std::cout << "\n n scelta: ";
@@ -75,13 +78,15 @@ void mostramenu(std::vector<datiRimborso> listaDati)
         mostraDati(listaDati);
         break;
     case 6:
+        fileDati.open("DATIRIMBORSO.csv", std::fstream::out);
+        caricaDati(listaDati, fileDati);
         break;
     case 7:
         return;
     }
     system("pause");
     system("cls");
-    mostramenu(listaDati);
+    mostramenu(listaDati, fileDati);
 }
 
 void mostraDati(std::vector<datiRimborso>listaDati) {
@@ -110,11 +115,31 @@ void mostraDati(std::vector<datiRimborso>listaDati) {
     }
 }
 
+
+void caricaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati) {
+    // Questa funzione carica i dati presenti nel vettore listaDati nel file di database
+    int vectLength = listaDati.size();
+    for (int i = 0; i < vectLength; i++) {
+        fileDati << listaDati[i].idPersona << ";";
+        fileDati << listaDati[i].idAuto << ";";
+        fileDati << listaDati[i].targa_Auto << ";";
+        fileDati << listaDati[i].costo_km_auto << ";";
+        fileDati << listaDati[i].km_rimborso << ";";
+        fileDati << listaDati[i].MeseRimb << ";";
+        fileDati << listaDati[i].AnnoRimb << ";";
+        fileDati << listaDati[i].des_auto << ";";
+        if (i < vectLength - 1)
+            fileDati << "\n";
+        std::cout << "Salvataggio 1";
+    }
+}
+
 void inserimentoDati(std::vector<datiRimborso>& listaDati) {
     /* Questa funzione chiede all'utente tutti i dati di una nuova struct da inserire nei rimborsi, e poi la inserisce nel vettore ordinatamente
     Poichè il campo idAuto deve essere un numero che identifica univocamente un'auto, nel caso in cui l'utente ne inserisca uno già
     esistente, egli può decidere se eliminare l'attuale inserimento o sovrascrivere il vecchio rimborso */
 
+    setlocale(LC_ALL, "");
     const int CARATTERI_TARGA = 7;
     datiRimborso datiInseriti;
     int nRimborsi = listaDati.size();
@@ -201,7 +226,7 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati) {
         datiInseriti.des_auto = listaDati[indiceAutoPresente].des_auto;
     else {
         do {
-            std::cout << "Descrizione auto (generalmente è il produtore): ";
+            std::cout << "Descrizione auto (generalmente è il produttore): ";
             std::cin >> buffer_string;
         } while (buffer_string.size() > 20);
         datiInseriti.des_auto = buffer_string;
@@ -290,6 +315,7 @@ void caricamentoDati(std::vector<datiRimborso>& listaDati, std::fstream& inputFi
     }
 
     listaDati.pop_back();
+    ordinamentoDati(listaDati);
 
     return;
 }

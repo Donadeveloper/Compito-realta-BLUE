@@ -8,12 +8,12 @@
 int main()
 {
     setlocale(LC_ALL, "");
-    std::fstream inputFile("DATIRIMBORSO.CSV", std::fstream::in);
+    std::fstream fileDati("DATIRIMBORSO.CSV", std::fstream::in);
     std::vector<datiRimborso> listaDati;
-    caricamentoDati(listaDati, inputFile);
+    caricamentoDati(listaDati, fileDati);
 
-    ordinamentoDati(listaDati);
-    mostramenu(listaDati);
+    mostramenu(listaDati, fileDati);
 
+    fileDati.close();
     return 0;
 }
