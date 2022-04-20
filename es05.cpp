@@ -7,10 +7,10 @@
 
 int main()
 {
+    setlocale(LC_ALL, "");
     std::fstream inputFile("DATIRIMBORSO.CSV", std::fstream::in);
     std::vector<datiRimborso> listaDati;
     caricamentoDati(listaDati, inputFile);
-    setlocale(LC_ALL, "");
 
     ordinamentoDati(listaDati);
     mostramenu(listaDati);

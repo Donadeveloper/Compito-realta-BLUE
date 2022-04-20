@@ -81,7 +81,7 @@ void mostramenu(std::vector<datiRimborso> listaDati)
     }
     system("pause");
     system("cls");
-    mostramenu();
+    mostramenu(listaDati);
 }
 
 void mostraDati(std::vector<datiRimborso>listaDati) {
