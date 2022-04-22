@@ -26,4 +26,4 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati);
 void mostraDati(std::vector<datiRimborso> listaDati);
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
 void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID);
-void caricaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);
+void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);

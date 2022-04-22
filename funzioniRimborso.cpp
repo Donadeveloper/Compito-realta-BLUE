@@ -28,7 +28,7 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati);
 void mostraDati(std::vector<datiRimborso> listaDati);
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
 void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID);
-void caricaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);
+void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);
 
 void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati)
 {
@@ -61,7 +61,7 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati)
         if (IDtrovato!=-1)
             mostra_per_IDAuto(listaDati,IDtrovato);
         else
-            std::cout << "non presente\n";
+            std::cout << "[!] ID non presente\n";
         break;
     case 3:
         std::cout << "Inserisci l'ID della persona che vuoi cercare:  ";
@@ -70,7 +70,7 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati)
         if (IDtrovato!=-1)
             mostra_per_IDPersona(listaDati,IDtrovato);
         else
-            std::cout << "non presente\n";
+            std::cout << "[!] ID non presente\n";
         break;
     case 4:
         break;
@@ -79,7 +79,8 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati)
         break;
     case 6:
         fileDati.open("DATIRIMBORSO.csv", std::fstream::out);
-        caricaDati(listaDati, fileDati);
+        salvaDati(listaDati, fileDati);
+        fileDati.open("DATIRIMBORSO.csv", std::fstream::in);
         break;
     case 7:
         return;
@@ -115,9 +116,8 @@ void mostraDati(std::vector<datiRimborso>listaDati) {
     }
 }
 
-
-void caricaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati) {
-    // Questa funzione carica i dati presenti nel vettore listaDati nel file di database
+void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati) {
+    // Questa funzione salva i dati presenti nel vettore listaDati nel file di database
     int vectLength = listaDati.size();
     for (int i = 0; i < vectLength; i++) {
         fileDati << listaDati[i].idPersona << ";";
@@ -130,7 +130,7 @@ void caricaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati) {
         fileDati << listaDati[i].des_auto << ";";
         if (i < vectLength - 1)
             fileDati << "\n";
-        std::cout << "Salvataggio 1";
+        std::cout << "Salvataggio 1" << std::endl;   //TEST
     }
 }
 
