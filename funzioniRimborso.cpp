@@ -35,59 +35,65 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati)
     unsigned int scelta;
     unsigned int IDcercato;
     unsigned int IDtrovato;
+    bool fineProgramma = false;
+    while (true) {
 
-    std::cout << "\n\n\t\t------RIMBORSO AUTO------\n";
-    std::cout << "\n\tBenvenuto nella gestione dei rimborsi auto cosa vuoi fare?:\n";
-    std::cout << "\t [1]  Inserire un rimborso\n";
-    std::cout << "\t [2]  Ricercare una vettura presente nel database dei rimborsi\n";
-    std::cout << "\t [3]  Ricercare una persona presente nel database dei rimborsi\n";
-    std::cout << "\t [4]  Rimuovere un rimborso presente nel database dei rimborsi\n";
-    std::cout << "\t [5]  Mostrare i rimborsi presenti nel database dei rimborsi\n";
-    std::cout << "\t [6]  Salvataggio modifiche\n";
-    std::cout << "\t [7]  ESC\n";
+        std::cout << "\n\n\t\t------RIMBORSO AUTO------\n";
+        std::cout << "\n\tBenvenuto nella gestione dei rimborsi auto cosa vuoi fare?:\n";
+        std::cout << "\t [1]  Inserire un rimborso\n";
+        std::cout << "\t [2]  Ricercare una vettura presente nel database dei rimborsi\n";
+        std::cout << "\t [3]  Ricercare una persona presente nel database dei rimborsi\n";
+        std::cout << "\t [4]  Rimuovere un rimborso presente nel database dei rimborsi\n";
+        std::cout << "\t [5]  Mostrare i rimborsi presenti nel database dei rimborsi\n";
+        std::cout << "\t [6]  Salvataggio modifiche\n";
+        std::cout << "\t [7]  ESC\n";
 
-    std::cout << "\n n scelta: ";
-    std::cin >> scelta;
+        std::cout << "\n n scelta: ";
+        std::cin >> scelta;
 
-    switch(scelta)
-    {
-    case 1:
-        inserimentoDati(listaDati);
-        break;
-    case 2:
-        std::cout << "Inserisci l'ID dell'auto che vuoi cercare:  ";
-        std::cin >> IDcercato;
-        IDtrovato = ricercaIdAuto(listaDati, IDcercato);
-        if (IDtrovato!=-1)
-            mostra_per_IDAuto(listaDati,IDtrovato);
-        else
-            std::cout << "[!] ID non presente\n";
-        break;
-    case 3:
-        std::cout << "Inserisci l'ID della persona che vuoi cercare:  ";
-        std::cin >> IDcercato;
-        IDtrovato = ricercaIdPersona(listaDati, IDcercato);
-        if (IDtrovato!=-1)
-            mostra_per_IDPersona(listaDati,IDtrovato);
-        else
-            std::cout << "[!] ID non presente\n";
-        break;
-    case 4:
-        break;
-    case 5:
-        mostraDati(listaDati);
-        break;
-    case 6:
-        fileDati.open("DATIRIMBORSO.csv", std::fstream::out);
-        salvaDati(listaDati, fileDati);
-        fileDati.open("DATIRIMBORSO.csv", std::fstream::in);
-        break;
-    case 7:
-        return;
+        switch(scelta)
+        {
+        case 1:
+            inserimentoDati(listaDati);
+            break;
+        case 2:
+            std::cout << "Inserisci l'ID dell'auto che vuoi cercare:  ";
+            std::cin >> IDcercato;
+            IDtrovato = ricercaIdAuto(listaDati, IDcercato);
+            if (IDtrovato!=-1)
+                mostra_per_IDAuto(listaDati,IDtrovato);
+            else
+                std::cout << "[!] ID non presente\n";
+            break;
+        case 3:
+            std::cout << "Inserisci l'ID della persona che vuoi cercare:  ";
+            std::cin >> IDcercato;
+            IDtrovato = ricercaIdPersona(listaDati, IDcercato);
+            if (IDtrovato!=-1)
+                mostra_per_IDPersona(listaDati,IDtrovato);
+            else
+                std::cout << "[!] ID non presente\n";
+            break;
+        case 4:
+            break;
+        case 5:
+            mostraDati(listaDati);
+            break;
+        case 6:
+            fileDati.open("DATIRIMBORSO.csv", std::fstream::out);
+            salvaDati(listaDati, fileDati);
+            fileDati.open("DATIRIMBORSO.csv", std::fstream::in);
+            break;
+        case 7:
+            return;
+            fineProgramma = true;
+        }
+        system("pause");
+        system("cls");
+        if (fineProgramma) {
+            break;
+        }
     }
-    system("pause");
-    system("cls");
-    mostramenu(listaDati, fileDati);
 }
 
 void mostraDati(std::vector<datiRimborso>listaDati) {

@@ -18,6 +18,7 @@ int main()
 
     mostramenu(listaDati, fileDati);
 
+    std::cout << "Chiusura programma. . .";
     fileDati.close();
     return 0;
 }
