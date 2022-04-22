@@ -88,11 +88,11 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati)
             return;
             fineProgramma = true;
         }
-        system("pause");
-        system("cls");
         if (fineProgramma) {
             break;
         }
+        system("pause");
+        system("cls");
     }
 }
 
