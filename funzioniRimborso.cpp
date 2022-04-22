@@ -88,11 +88,11 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati)
             return;
             fineProgramma = true;
         }
+        system("pause");
+        system("cls");
         if (fineProgramma) {
             break;
         }
-        system("pause");
-        system("cls");
     }
 }
 
@@ -124,6 +124,7 @@ void mostraDati(std::vector<datiRimborso>listaDati) {
 
 void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati) {
     // Questa funzione salva i dati presenti nel vettore listaDati nel file di database
+
     int vectLength = listaDati.size();
     for (int i = 0; i < vectLength; i++) {
         fileDati << listaDati[i].idPersona << ";";
@@ -134,9 +135,7 @@ void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati) {
         fileDati << listaDati[i].MeseRimb << ";";
         fileDati << listaDati[i].AnnoRimb << ";";
         fileDati << listaDati[i].des_auto << ";";
-        if (i < vectLength - 1)
-            fileDati << "\n";
-        std::cout << "Salvataggio 1" << std::endl;   //TEST
+        std::cout << "Salvataggio " << listaDati[i].des_auto << std::endl;   //TEST
     }
 }
 
