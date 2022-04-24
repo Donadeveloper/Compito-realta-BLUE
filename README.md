@@ -5,7 +5,7 @@ Compito di realtà
 
 I dati dei rimborsi vengono presi in input da un file .csv “input.txt” creato con Excel formattato in maniera tale da avere diverse righe: ogni riga contiene, separati da una virgola, i dati di ogni rimborso in ordine seguente: 
 
-IdAuto,des_auto,targa_auto,costo_km_auto,IdPersona,AnnoRimb,MeseRimb,km_rimborso
+IdPersona,IdAuto,targa_auto,costo_km_auto,AnnoRimb,MeseRimb,km_rimborso, des_auto
 
 Questi dati verranno presi da una struttura dati di tipo fstream impostata come “read”, per poi essere caricati da una funzione apposita in diverse struct (una per rimborso), che a loro volta verranno caricate in una variabile di tipo vector dalla stessa funzione.
 
