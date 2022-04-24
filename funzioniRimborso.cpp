@@ -24,6 +24,7 @@ void ordinamentoDati(std::vector<datiRimborso>& listaDati);
 void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare);
 int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato);
 int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato);
+int ricercaTarga(std::vector<datiRimborso> listaDati, std::string targaRicercata);
 void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati);
 void mostraDati(std::vector<datiRimborso> listaDati);
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
@@ -31,8 +32,9 @@ void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID)
 void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);
 void cancellaRimborso(std::vector<datiRimborso>& listaDati, const int idDaEliminare, bool &modDaSalvare);
 
-void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati)
-{
+void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati) {
+    // Funzione principale del software, mostra all'utente le scelte possibili e raccoglie gli input necessari. La scelta 7 chiude il programma
+
     unsigned int scelta;
     unsigned int IDcercato;
     unsigned int IDtrovato;
@@ -160,7 +162,6 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare) {
     esistente, egli può decidere se eliminare l'attuale inserimento o sovrascrivere il vecchio rimborso. Inoltre, la funzione modifica la variabile
     modDaSalvare, in maniera che il prossimo menu avvisi l'utente che ci sono delle modifiche non salvate nel file */
 
-    setlocale(LC_ALL, "");
     const int CARATTERI_TARGA = 7;
     datiRimborso datiInseriti;
     int nRimborsi = listaDati.size();
@@ -168,7 +169,7 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare) {
     std::string buffer_string;
     double buffer_double;
     char buffer_char;
-    int indiceAutoPresente = -1;
+    int indiceAutoPresente;
     bool sovrascrittura = false;
     modDaSalvare = false;
 
@@ -181,39 +182,33 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare) {
     } while (buffer_int <= 0);
     datiInseriti.idPersona = buffer_int;
 
-    // Inserimento idAuto
-    do {
-        std::cout << "ID Auto - numero intero identificativo dell'auto: ";
-        std::cin >> buffer_int;
-    } while (buffer_int <= 0);
+    // Inserimento idAuto (IdAuto deve essere un numero progressivo)
+    datiInseriti.idAuto = nRimborsi + 1;
 
-    // Gestione del caso in cui l'idAuto inserito sia già presente tra i dati
-    indiceAutoPresente = ricercaIdAuto(listaDati, buffer_int);
+    // Inserimento targa
+    do {
+        std::cout << "Targa auto (7 caratteri): ";
+        std::cin >> buffer_string;
+    } while (buffer_string.size() != CARATTERI_TARGA);  
+
+    // Gestione del caso in cui la targa inserita sia già presente tra i dati
+    indiceAutoPresente = ricercaTarga(listaDati, buffer_string);
 
     if (indiceAutoPresente >= 0) {
         do {
-            std::cout << "\n[!] ID AUTO TROVATO NEI DATI.\nInterrompere l'inserimento del nuovo rimborso o sovrascrivere quello gia esistente?(i/s): ";
+            std::cout << "\n[!] TARGA TROVATa NEI DATI.\n- Interrompere l'inserimento del nuovo rimborso o sovrascrivere quello gia esistente?(i/s): ";
             std::cin >> buffer_char;
         } while (buffer_char != 'i' && buffer_char != 'I' && buffer_char != 's' && buffer_char != 'S');
         if (buffer_char == 'i' || buffer_char == 'I')
             return;
         else {
+            /* Se l'utente vuole sovrascrivere un rimborso lo tengo a mente in una variabile e la utilizzo 
+            alla fine della funzione per salvare tutto su un rimborso già esistente */
             sovrascrittura = true;
-            std::cout << "Verrà sovrascritto il rimborso dell'auto di ID " << buffer_int << ". Targa e descrizione non verranno modificati\n\n";
+            std::cout << "Verrà sovrascritto il rimborso dell'auto di targa " << buffer_string << "\n\n";
         }
     }
-    datiInseriti.idAuto = buffer_int;
-
-    // Inserimento targa
-    if (sovrascrittura)
-        datiInseriti.targa_Auto = listaDati[indiceAutoPresente].targa_Auto;
-    else {
-        do {
-            std::cout << "Targa auto (7 caratteri): ";
-            std::cin >> buffer_string;
-        } while (buffer_string.size() != CARATTERI_TARGA);
-        datiInseriti.targa_Auto = buffer_string;
-    }
+    datiInseriti.targa_Auto = buffer_string;
 
     // Inserimento costo_km_auto
     do {
@@ -248,7 +243,7 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare) {
         datiInseriti.des_auto = listaDati[indiceAutoPresente].des_auto;
     else {
         do {
-            std::cout << "Descrizione auto (generalmente è il produttore): ";
+            std::cout << "Descrizione auto (generalmente il produttore): ";
             std::cin >> buffer_string;
         } while (buffer_string.size() > 20);
         datiInseriti.des_auto = buffer_string;
@@ -267,10 +262,23 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare) {
 
 }
 
+
+int ricercaTarga(std::vector<datiRimborso> listaDati, std::string targaRicercata) {
+    // Ricerca per targa. Ritorna -1 se non trova la targa ricercata
+    int vectSize;
+
+    vectSize = listaDati.size();
+    for (int i = 0; i < vectSize; i++) {
+        if (targaRicercata.compare(listaDati[i].targa_Auto) == 0)
+            return i;
+    }
+    return -1; 
+}
+
 void ordinamentoDati(std::vector<datiRimborso>& listaDati) {
-    // Questa funzione ordina le struct contenute nel vettore listaDati secondo il loro campo "idPersona"
-    // L'algoritmo di ordinamento utilizzato è il bubble sort ottimizzato con sentinella
-    // Ad ogni iterazione del bubble sort, se i due elementi comparati hanno idPersona uguale, essi vengono ordinati secondo il campo targa
+    /* Questa funzione ordina le struct contenute nel vettore listaDati secondo il loro campo "idPersona"
+    L'algoritmo di ordinamento utilizzato è il bubble sort ottimizzato con sentinella
+    Ad ogni iterazione del bubble sort, se i due elementi comparati hanno idPersona uguale, essi vengono ordinati secondo il campo targa */
 
     int vectSize;
     datiRimborso temp_swap;
@@ -385,7 +393,7 @@ double stringToDouble(std::string str)
     return temp;
 }
 
-int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato) //ricerca secondo IDAuto
+int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato) //ricerca secondo IDAuto. Ritorna -1 se non trova l'id ricercato
 {
     int vectSize;
 
@@ -394,11 +402,10 @@ int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato) //
         if (listaDati[i].idAuto == idRicercato)
             return i;
     }
-    std::cout << "[!] ID non presente\n";
     return -1; 
 }
 
-int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato) //ricerca secondo IDPersona
+int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato) //ricerca secondo IDPersona. Ritorna -1 se non trova l'id ricercato
 {
     int sx = 0, dx = listaDati.size() - 1, med, pos = -1;
     while ((sx <= dx) && (pos == -1))
@@ -407,16 +414,16 @@ int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato)
         if (listaDati[med].idPersona == idRicercato)
             pos = med;
         else if (idRicercato < listaDati[med].idPersona)
-            dx = med - 1;                               //se l'ID è più piccolo allora il punto destro diminuirà cosi da spostare il punto medio per la ricerca più a sinistra
+            dx = med - 1;       //se l'ID è più piccolo allora il punto destro diminuirà cosi da spostare il punto medio per la ricerca più a sinistra
         else
         {
-            sx = med + 1;                               //se l'ID è più grande allora il punto sinistro aumenterà cosi da spostare il punto medio per la ricerca più a destra
+            sx = med + 1;       //se l'ID è più grande allora il punto sinistro aumenterà cosi da spostare il punto medio per la ricerca più a destra
         }
     }
     return pos;
 }
 
-void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID)   //funzione che mostra tutti i dati inerenti all'IDAuto cercato
+void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID) //funzione che mostra tutti i dati inerenti all'IDAuto cercato
 {
     std::cout << "\n|ID PERSONA\t|ID AUTO\t|TARGA\t\t|COSTO(Euro/Km)\t|KM AUTO\t|MESE\t|ANNO\t|DESCRIZIONE AUTO\n" <<
             "----------------------------------------------------------------------------------------------------------------\n";
@@ -435,13 +442,14 @@ void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID)   
         std::cout << "|" << listaDati[pos_ID].des_auto << "\t" << std::endl;
 }
 
-void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID)    // funzione che mostra tutti i dati inerenti all'ID persona cercato
+void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID) // funzione che mostra tutti i dati inerenti all'ID persona cercato
 {
-    std::vector<datiRimborso>ID_cercato;                                            //creo un vector temporaneo per salvare tutti i dati appartenenti all'IDPersona cercato
+    std::vector<datiRimborso>ID_cercato;        //creo un vector temporaneo per salvare tutti i dati appartenenti all'IDPersona cercato
     for(int i=0;i<listaDati.size();i++)
     {
-        if(listaDati[i].idPersona==listaDati[pos_ID].idPersona)                     /*controllo per in quali posizioni i si trovano tutti i dati appartenenti alla persona cercata
-                                                                                    che si trova in posizione pos_ID e li salvo nel vector temporane*/
+        if(listaDati[i].idPersona==listaDati[pos_ID].idPersona)                     
+        /*controllo per in quali posizioni i si trovano tutti i dati appartenenti alla persona cercata
+        che si trova in posizione pos_ID e li salvo nel vector temporane*/
         {
             datiRimborso save_ID_temp=listaDati[i];
             ID_cercato.push_back(save_ID_temp);
@@ -450,17 +458,17 @@ void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID)
 
     std::cout << "\n|ID PERSONA\t|ID AUTO\t|TARGA\t\t|COSTO(Euro/Km)\t|KM AUTO\t|MESE\t|ANNO\t|DESCRIZIONE AUTO\n" <<
             "----------------------------------------------------------------------------------------------------------------\n";
-    for(int i=0;i<ID_cercato.size();i++)        //con il vector temporaneo mostro a video all'utente tutti i dati della persona
+    for(int i=0;i<ID_cercato.size();i++)  //con il vector temporaneo mostro a video all'utente tutti i dati della persona
     {
         std::cout << "|" << ID_cercato[i].idPersona<<"\t";
         if (ID_cercato[i].idPersona < 1000000)
-            std::cout << "\t"; // Se l'id persona non supera il milione stampo un altro tab (causa formattazione della tabella)
+            std::cout << "\t";  // Se l'id persona non supera il milione stampo un altro tab (causa formattazione della tabella)
         std::cout << "|" << ID_cercato[i].idAuto << "\t\t";
         std::cout << "|" << ID_cercato[i].targa_Auto << "\t";
         std::cout << "|" << ID_cercato[i].costo_km_auto << "\t\t";
         std::cout << "|" << ID_cercato[i].km_rimborso << "\t";
         if (ID_cercato[i].km_rimborso < 1000000)
-            std::cout << "\t";
+            std::cout << "\t";  // Se i km non superano il milione stampo un altro tab (causa formattazione della tabella)
         std::cout << "|" << ID_cercato[i].MeseRimb << "\t";
         std::cout << "|" << ID_cercato[i].AnnoRimb << "\t";
         std::cout << "|" << ID_cercato[i].des_auto << "\t" << std::endl;
