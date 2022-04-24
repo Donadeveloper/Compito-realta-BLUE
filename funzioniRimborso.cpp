@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <locale>
 
 struct datiRimborso {
 
@@ -15,73 +16,100 @@ struct datiRimborso {
     long long int km_rimborso;
 };
 
+
 void caricamentoDati(std::vector<datiRimborso>& listaDati, std::fstream& inputFile);
 int stringToInt(std::string);
 double stringToDouble(std::string);
 void ordinamentoDati(std::vector<datiRimborso>& listaDati);
-void inserimentoDati(std::vector<datiRimborso>& listaDati);
+void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare);
 int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato);
 int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato);
-void mostramenu(std::vector<datiRimborso> listaDati);
+void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati);
 void mostraDati(std::vector<datiRimborso> listaDati);
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
 void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID);
+void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);
+void cancellaRimborso(std::vector<datiRimborso>& listaDati, const int idDaEliminare, bool &modDaSalvare);
 
-void mostramenu(std::vector<datiRimborso> listaDati)
+void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati)
 {
     unsigned int scelta;
     unsigned int IDcercato;
     unsigned int IDtrovato;
+    bool modDaSalvare = false;
+    bool fineProgramma = false;
+    while (true) {
 
-    std::cout << "\n\n\t\t------RIMBORSO AUTO------\n";
-    std::cout << "\n\tBenvenuto nella gestione dei rimborsi auto cosa vuoi fare?:\n";
-    std::cout << "\t [1]  Inserire un rimborso\n";
-    std::cout << "\t [2]  Ricercare una vettura presente nel database dei rimborsi\n";
-    std::cout << "\t [3]  Ricercare una persona presente nel database dei rimborsi\n";
-    std::cout << "\t [4]  Rimuovere un rimborso presente nel database dei rimborsi\n";
-    std::cout << "\t [5]  Mostrare i rimborsi presenti nel database dei rimborsi\n";
-    std::cout << "\t [6]  Salvataggio \n";
-    std::cout << "\t [7]  ESC\n";
+        std::cout << "\n\n\t\t------RIMBORSO AUTO------\n";
+        std::cout << "\n\tBenvenuto nella gestione dei rimborsi auto cosa vuoi fare?:\n";
+        std::cout << "\t [1]  Inserire un rimborso\n";
+        std::cout << "\t [2]  Ricercare una vettura presente nel database dei rimborsi\n";
+        std::cout << "\t [3]  Ricercare una persona presente nel database dei rimborsi\n";
+        std::cout << "\t [4]  Rimuovere un rimborso presente nel database dei rimborsi\n";
+        std::cout << "\t [5]  Mostrare i rimborsi presenti nel database dei rimborsi\n";
+        std::cout << "\t [6]  Salvataggio modifiche";
+        if (modDaSalvare)
+            std::cout << "  [RILEVATE MODIFICHE NON SALVATE]";
+        std::cout << "\n\t [7]  ESC\n";
 
-    std::cout << "\n n scelta: ";
-    std::cin >> scelta;
+        do {
+            std::cout << "\n n scelta: ";
+            std::cin >> scelta;
+        } while (scelta < 1 || scelta > 7);
 
-    switch(scelta)
-    {
-    case 1:
-        inserimentoDati(listaDati);
-        break;
-    case 2:
-        std::cout << "Inserisci l'ID dell'auto che vuoi cercare:  ";
-        std::cin >> IDcercato;
-        IDtrovato = ricercaIdAuto(listaDati, IDcercato);
-        if (IDtrovato!=-1)
-            mostra_per_IDAuto(listaDati,IDtrovato);
-        else
-            std::cout << "non presente\n";
-        break;
-    case 3:
-        std::cout << "Inserisci l'ID della persona che vuoi cercare:  ";
-        std::cin >> IDcercato;
-        IDtrovato = ricercaIdPersona(listaDati, IDcercato);
-        if (IDtrovato!=-1)
-            mostra_per_IDPersona(listaDati,IDtrovato);
-        else
-            std::cout << "non presente\n";
-        break;
-    case 4:
-        break;
-    case 5:
-        mostraDati(listaDati);
-        break;
-    case 6:
-        break;
-    case 7:
-        return;
+        switch(scelta)
+        {
+        case 1:
+            inserimentoDati(listaDati, modDaSalvare);
+            break;
+        case 2:
+            std::cout << "Inserisci l'ID dell'auto che vuoi cercare:  ";
+            std::cin >> IDcercato;
+            IDtrovato = ricercaIdAuto(listaDati, IDcercato);
+            if (IDtrovato!=-1)
+                mostra_per_IDAuto(listaDati,IDtrovato);
+            else
+                std::cout << "[!] ID non presente\n";
+            break;
+        case 3:
+            std::cout << "Inserisci l'ID della persona che vuoi cercare:  ";
+            std::cin >> IDcercato;
+            IDtrovato = ricercaIdPersona(listaDati, IDcercato);
+            if (IDtrovato!=-1)
+                mostra_per_IDPersona(listaDati,IDtrovato);
+            else
+                std::cout << "[!] ID non presente\n";
+            break;
+        case 4:
+            std::cout << "Inserisci l'ID dell'auto di cui vuoi eliminare il rimborso:  ";
+            std::cin >> IDcercato;
+            IDtrovato = ricercaIdAuto(listaDati, IDcercato);
+            if (IDtrovato!=-1) 
+                cancellaRimborso(listaDati, IDtrovato, modDaSalvare);
+            else
+                std::cout << "[!] ID non presente\n";
+            break;
+        case 5:
+            mostraDati(listaDati);
+            break;
+        case 6:
+            fileDati.close();
+            fileDati.open("DATIRIMBORSO.csv", std::fstream::out);
+            salvaDati(listaDati, fileDati);
+            modDaSalvare = false;
+            fileDati.close();
+            fileDati.open("DATIRIMBORSO.csv", std::fstream::in);
+            break;
+        case 7:
+            return;
+            fineProgramma = true;
+        }
+        system("pause");
+        system("cls");
+        if (fineProgramma) {
+            break;
+        }
     }
-    system("pause");
-    system("cls");
-    mostramenu(listaDati);
 }
 
 void mostraDati(std::vector<datiRimborso>listaDati) {
@@ -110,11 +138,29 @@ void mostraDati(std::vector<datiRimborso>listaDati) {
     }
 }
 
-void inserimentoDati(std::vector<datiRimborso>& listaDati) {
+void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati) {
+    // Questa funzione salva i dati presenti nel vettore listaDati nel file di database
+
+    int vectLength = listaDati.size();
+    for (int i = 0; i < vectLength; i++) {
+        fileDati << listaDati[i].idPersona << ";";
+        fileDati << listaDati[i].idAuto << ";";
+        fileDati << listaDati[i].targa_Auto << ";";
+        fileDati << listaDati[i].costo_km_auto << ";";
+        fileDati << listaDati[i].AnnoRimb << ";";
+        fileDati << listaDati[i].MeseRimb << ";";
+        fileDati << listaDati[i].km_rimborso << ";";
+        fileDati << listaDati[i].des_auto << "\n";
+    }
+}
+
+void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare) {
     /* Questa funzione chiede all'utente tutti i dati di una nuova struct da inserire nei rimborsi, e poi la inserisce nel vettore ordinatamente
     Poichè il campo idAuto deve essere un numero che identifica univocamente un'auto, nel caso in cui l'utente ne inserisca uno già
-    esistente, egli può decidere se eliminare l'attuale inserimento o sovrascrivere il vecchio rimborso */
+    esistente, egli può decidere se eliminare l'attuale inserimento o sovrascrivere il vecchio rimborso. Inoltre, la funzione modifica la variabile
+    modDaSalvare, in maniera che il prossimo menu avvisi l'utente che ci sono delle modifiche non salvate nel file */
 
+    setlocale(LC_ALL, "");
     const int CARATTERI_TARGA = 7;
     datiRimborso datiInseriti;
     int nRimborsi = listaDati.size();
@@ -124,6 +170,7 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati) {
     char buffer_char;
     int indiceAutoPresente = -1;
     bool sovrascrittura = false;
+    modDaSalvare = false;
 
     std::cout << "\n[INSERIMENTO NUOVO RIMBORSO]";
 
@@ -152,7 +199,7 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati) {
             return;
         else {
             sovrascrittura = true;
-            std::cout << "Verr� sovrascritto il rimborso dell'auto di ID " << buffer_int << ". Targa e descrizione non verranno modificati\n\n";
+            std::cout << "Verrà sovrascritto il rimborso dell'auto di ID " << buffer_int << ". Targa e descrizione non verranno modificati\n\n";
         }
     }
     datiInseriti.idAuto = buffer_int;
@@ -201,7 +248,7 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati) {
         datiInseriti.des_auto = listaDati[indiceAutoPresente].des_auto;
     else {
         do {
-            std::cout << "Descrizione auto (generalmente è il produtore): ";
+            std::cout << "Descrizione auto (generalmente è il produttore): ";
             std::cin >> buffer_string;
         } while (buffer_string.size() > 20);
         datiInseriti.des_auto = buffer_string;
@@ -215,10 +262,10 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati) {
         listaDati.push_back(datiInseriti);
     }
     ordinamentoDati(listaDati);
+    modDaSalvare = true;
     return;
 
 }
-
 
 void ordinamentoDati(std::vector<datiRimborso>& listaDati) {
     // Questa funzione ordina le struct contenute nel vettore listaDati secondo il loro campo "idPersona"
@@ -261,35 +308,39 @@ void ordinamentoDati(std::vector<datiRimborso>& listaDati) {
 void caricamentoDati(std::vector<datiRimborso>& listaDati, std::fstream& inputFile)
 {
     datiRimborso temporaneo;
-    std::string temp;
+    std::string tempStr;
     while (!inputFile.eof())
     {
-        getline(inputFile, temp, ';');
-        temporaneo.idPersona = stringToInt(temp);
+        getline(inputFile, tempStr, ';');
+        /* Dopo aver preso i valori dell'ultima riga, il ciclo si ripete un'ultima volta. Controllo se ho raggiunto l'EOF dopo aver preso il primo dato, 
+        in modo da interrompermi se mi trovo in quel caso, così evito di avere un rimborso "sporco" come ultimo rimborso nella listaDati */
+        if (inputFile.eof())
+            break;
+        temporaneo.idPersona = stringToInt(tempStr);
 
-        getline(inputFile, temp, ';');
-        temporaneo.idAuto = stringToInt(temp);
+        getline(inputFile, tempStr, ';');
+        temporaneo.idAuto = stringToInt(tempStr);
 
         getline(inputFile, temporaneo.targa_Auto, ';');
 
-        getline(inputFile, temp, ';');
-        temporaneo.costo_km_auto = stringToDouble(temp);
+        getline(inputFile, tempStr, ';');
+        temporaneo.costo_km_auto = stringToDouble(tempStr);
 
-        getline(inputFile, temp, ';');
-        temporaneo.AnnoRimb = stringToInt(temp);
+        getline(inputFile, tempStr, ';');
+        temporaneo.AnnoRimb = stringToInt(tempStr);
 
-        getline(inputFile, temp, ';');
-        temporaneo.MeseRimb = stringToInt(temp);
+        getline(inputFile, tempStr, ';');
+        temporaneo.MeseRimb = stringToInt(tempStr);
 
-        getline(inputFile, temp, ';');
-        temporaneo.km_rimborso = stringToDouble(temp);
+        getline(inputFile, tempStr, ';');
+        temporaneo.km_rimborso = stringToDouble(tempStr);
 
         getline(inputFile, temporaneo.des_auto);
 
         listaDati.push_back(temporaneo);
     }
 
-    listaDati.pop_back();
+    ordinamentoDati(listaDati);
 
     return;
 }
@@ -334,54 +385,17 @@ double stringToDouble(std::string str)
     return temp;
 }
 
-void ordinamentoDati_secondo_idAuto(std::vector<datiRimborso>& listaDati) {
-    /* questo ordinamento deve essere fatto quando si richiede una ricerca per IDAuto
-    che altrimenti potrebbe dare problemi se per esempio la persona con IDPersona 1
-    ha l'auto con ID 24 questo perchè l'ordinamento del database in generale è fatto secondo l'IDPersona */
-
+int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato) //ricerca secondo IDAuto
+{
     int vectSize;
-    datiRimborso temp_swap;
 
     vectSize = listaDati.size();
-
-    bool sentinella_swap;
     for (int i = 0; i < vectSize; i++) {
-        sentinella_swap = false;
-        for (int j = 0; j < vectSize - 1 - i; j++) {
-            if (listaDati[j].idAuto > listaDati[j + 1].idAuto) {
-                // Ordinamento per IdAuto
-                temp_swap = listaDati[j];
-                listaDati[j] = listaDati[j + 1];
-                listaDati[j + 1] = temp_swap;
-                sentinella_swap = true;
-            }
-        }
-        if (sentinella_swap == false) {
-            // Se non ho scambiato di posto nessuna struct in un'iterazione, il vettore è ordinato e posso uscire dal ciclo
-            break;
-        }
-
+        if (listaDati[i].idAuto == idRicercato)
+            return i;
     }
-    return;
-}
-
-int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato)//ricerca secondo IDAuto
-{
-    ordinamentoDati_secondo_idAuto(listaDati);//ordinamento per poter usufruire della ricerca per IDAuto
-    int sx = 0, dx = listaDati.size() - 1, med, pos = -1;
-    while ((sx <= dx) && (pos == -1))
-    {
-        med = (sx + dx) / 2;
-        if (listaDati[med].idAuto == idRicercato)
-            pos = med;
-        else if (idRicercato < listaDati[med].idAuto)
-                dx = med - 1;                           //se l'ID è più piccolo allora il punto destro diminuirà cosi da spostare il punto medio per la ricerca più a sinistra
-        else
-        {
-            sx = med + 1;                               //se l'ID è più grande allora il punto sinistro aumenterà cosi da spostare il punto medio per la ricerca più a destra
-        }
-    }
-    return pos;
+    std::cout << "[!] ID non presente\n";
+    return -1; 
 }
 
 int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato) //ricerca secondo IDPersona
@@ -452,4 +466,17 @@ void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID)
         std::cout << "|" << ID_cercato[i].des_auto << "\t" << std::endl;
     }
 
+}
+
+void cancellaRimborso(std::vector<datiRimborso> &listaDati, const int idDaEliminare, bool &modDaSalvare) {
+    /* Questa funzione elimina dal vettore listaDati il rimborso che ha come idAuto idDaEliminare. Modifica, inoltre,
+    la variabile modDaSalvare, in maniera che il prossimo menu avvisi l'utente che ci sono delle modifiche non salvate nel file */
+    int vectSize;
+    
+    vectSize = listaDati.size();
+    for (int i = idDaEliminare; i < vectSize; i++) {
+        listaDati[i] = listaDati[i+1];
+    }
+    listaDati.pop_back();
+    modDaSalvare = true;
 }
