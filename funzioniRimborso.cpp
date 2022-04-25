@@ -21,14 +21,15 @@ void caricamentoDati(std::vector<datiRimborso>& listaDati, std::fstream& inputFi
 int stringToInt(std::string);
 double stringToDouble(std::string);
 void ordinamentoDati(std::vector<datiRimborso>& listaDati);
+void intBubbleSort(std::vector<int>& vect);
 void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare);
 int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato);
-int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato);
+void ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato, std::vector<int> &IdPersonaTrovati);
 int ricercaTarga(std::vector<datiRimborso> listaDati, std::string targaRicercata);
 void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati);
 void mostraDati(std::vector<datiRimborso> listaDati);
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
-void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID);
+void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati, std::vector<int> &IdPersonaTrovati) ;
 void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);
 void cancellaRimborso(std::vector<datiRimborso>& listaDati, const int idDaEliminare, bool &modDaSalvare);
 
@@ -38,6 +39,7 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati) {
     unsigned int scelta;
     unsigned int IDcercato;
     unsigned int IDtrovato;
+    std::vector<int> IdPersonaTrovati;
     bool modDaSalvare = false;
     bool fineProgramma = false;
     while (true) {
@@ -76,9 +78,9 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati) {
         case 3:
             std::cout << "Inserisci l'ID della persona che vuoi cercare:  ";
             std::cin >> IDcercato;
-            IDtrovato = ricercaIdPersona(listaDati, IDcercato);
-            if (IDtrovato!=-1)
-                mostra_per_IDPersona(listaDati,IDtrovato);
+            ricercaIdPersona(listaDati, IDcercato, IdPersonaTrovati);
+            if (IdPersonaTrovati.size() > 0)
+                mostra_per_IDPersona(listaDati, IdPersonaTrovati);
             else
                 std::cout << "[!] ID non presente\n";
             break;
@@ -405,9 +407,11 @@ int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato) //
     return -1; 
 }
 
-int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato) //ricerca secondo IDPersona. Ritorna -1 se non trova l'id ricercato
+void ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato, std::vector<int> &IdPersonaTrovati) 
+//ricerca secondo IDPersona. Gli indici in cui viene trovato l'ID vengono salvati nel vettore IdPersonaTrovati
 {
-    int sx = 0, dx = listaDati.size() - 1, med, pos = -1;
+    int vectSize = listaDati.size();
+    int sx = 0, dx = vectSize - 1, med, pos = -1;
     while ((sx <= dx) && (pos == -1))
     {
         med = (sx + dx) / 2;
@@ -420,7 +424,55 @@ int ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato)
             sx = med + 1;       //se l'ID è più grande allora il punto sinistro aumenterà cosi da spostare il punto medio per la ricerca più a destra
         }
     }
-    return pos;
+    IdPersonaTrovati.push_back(pos);
+    std::cout << "posizione: " << pos << std::endl;
+
+    // Procedo a sinistra nel vettore finchè non trovo un ID diverso da quello cercato
+    int i = 1;
+    while (pos != 0 && listaDati[pos - i].idPersona == idRicercato) {
+        IdPersonaTrovati.push_back(pos - i);
+
+        std::cout << "posizione: " << pos-i << std::endl;
+        i++;
+    }
+
+    // Procedo a destra nel vettore finchè non trovo un ID diverso da quello cercato
+    i = 1;
+    while (pos != vectSize - 1 && listaDati[pos + i].idPersona == idRicercato) {
+        IdPersonaTrovati.push_back(pos + i);
+
+        std::cout << "posizione: " << pos+i << std::endl;
+        i++;
+    }
+    intBubbleSort(IdPersonaTrovati);
+}
+
+void intBubbleSort(std::vector<int>& vect) {
+    // Questa funzione ordina con l'algoritmo di bubble sort il vettore di interi
+
+    int vectSize;
+    int temp_swap;
+
+    vectSize = vect.size();
+
+    bool sentinella_swap;
+    for (int i = 0; i < vectSize; i++) {
+        sentinella_swap = false;
+        for (int j = 0; j < vectSize - 1 - i; j++) {
+            if (vect[j] > vect[j + 1]) {
+                temp_swap = vect[j];
+                vect[j] = vect[j + 1];
+                vect[j + 1] = temp_swap;
+                sentinella_swap = true;
+            }
+        }
+        if (sentinella_swap == false) {
+            // Se non ho scambiato di posto nessuna struct in un'iterazione, il vettore è ordinato e posso uscire dal ciclo
+            break;
+        }
+
+    }
+    return;
 }
 
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID) //funzione che mostra tutti i dati inerenti all'IDAuto cercato
@@ -442,36 +494,25 @@ void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID) //
         std::cout << "|" << listaDati[pos_ID].des_auto << "\t" << std::endl;
 }
 
-void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati,const int pos_ID) // funzione che mostra tutti i dati inerenti all'ID persona cercato
+void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati, std::vector<int> &IdPersonaTrovati) 
+// funzione che mostra tutti i dati inerenti all'ID persona cercato (anche multipli rimborsi)
 {
-    std::vector<datiRimborso>ID_cercato;        //creo un vector temporaneo per salvare tutti i dati appartenenti all'IDPersona cercato
-    for(int i=0;i<listaDati.size();i++)
-    {
-        if(listaDati[i].idPersona==listaDati[pos_ID].idPersona)                     
-        /*controllo per in quali posizioni i si trovano tutti i dati appartenenti alla persona cercata
-        che si trova in posizione pos_ID e li salvo nel vector temporane*/
-        {
-            datiRimborso save_ID_temp=listaDati[i];
-            ID_cercato.push_back(save_ID_temp);
-        }
-    }
-
     std::cout << "\n|ID PERSONA\t|ID AUTO\t|TARGA\t\t|COSTO(Euro/Km)\t|KM AUTO\t|MESE\t|ANNO\t|DESCRIZIONE AUTO\n" <<
             "----------------------------------------------------------------------------------------------------------------\n";
-    for(int i=0;i<ID_cercato.size();i++)  //con il vector temporaneo mostro a video all'utente tutti i dati della persona
+    for(int i=0;i<IdPersonaTrovati.size();i++)  //con il vector temporaneo mostro a video all'utente tutti i dati della persona
     {
-        std::cout << "|" << ID_cercato[i].idPersona<<"\t";
-        if (ID_cercato[i].idPersona < 1000000)
+        std::cout << "|" << listaDati[IdPersonaTrovati[i]].idPersona<<"\t";
+        if (listaDati[IdPersonaTrovati[i]].idPersona < 1000000)
             std::cout << "\t";  // Se l'id persona non supera il milione stampo un altro tab (causa formattazione della tabella)
-        std::cout << "|" << ID_cercato[i].idAuto << "\t\t";
-        std::cout << "|" << ID_cercato[i].targa_Auto << "\t";
-        std::cout << "|" << ID_cercato[i].costo_km_auto << "\t\t";
-        std::cout << "|" << ID_cercato[i].km_rimborso << "\t";
-        if (ID_cercato[i].km_rimborso < 1000000)
+        std::cout << "|" << listaDati[IdPersonaTrovati[i]].idAuto << "\t\t";
+        std::cout << "|" << listaDati[IdPersonaTrovati[i]].targa_Auto << "\t";
+        std::cout << "|" << listaDati[IdPersonaTrovati[i]].costo_km_auto << "\t\t";
+        std::cout << "|" << listaDati[IdPersonaTrovati[i]].km_rimborso << "\t";
+        if (listaDati[IdPersonaTrovati[i]].km_rimborso < 1000000)
             std::cout << "\t";  // Se i km non superano il milione stampo un altro tab (causa formattazione della tabella)
-        std::cout << "|" << ID_cercato[i].MeseRimb << "\t";
-        std::cout << "|" << ID_cercato[i].AnnoRimb << "\t";
-        std::cout << "|" << ID_cercato[i].des_auto << "\t" << std::endl;
+        std::cout << "|" << listaDati[IdPersonaTrovati[i]].MeseRimb << "\t";
+        std::cout << "|" << listaDati[IdPersonaTrovati[i]].AnnoRimb << "\t";
+        std::cout << "|" << listaDati[IdPersonaTrovati[i]].des_auto << "\t" << std::endl;
     }
 
 }
