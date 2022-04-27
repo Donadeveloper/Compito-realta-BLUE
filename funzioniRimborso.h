@@ -30,3 +30,4 @@ void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
 void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati, std::vector<int> &IdPersonaTrovati) ;
 void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);
 void cancellaRimborso(std::vector<datiRimborso>& listaDati, const int idDaEliminare, bool &modDaSalvare);
+bool convalida_targa(const std::string targa);

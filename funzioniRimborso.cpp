@@ -32,6 +32,7 @@ void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
 void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati, std::vector<int> &IdPersonaTrovati) ;
 void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);
 void cancellaRimborso(std::vector<datiRimborso>& listaDati, const int idDaEliminare, bool &modDaSalvare);
+bool convalida_targa(const std::string targa);
 
 void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati) {
     // Funzione principale del software, mostra all'utente le scelte possibili e raccoglie gli input necessari. La scelta 7 chiude il programma
@@ -88,7 +89,7 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati) {
             std::cout << "Inserisci l'ID dell'auto di cui vuoi eliminare il rimborso:  ";
             std::cin >> IDcercato;
             IDtrovato = ricercaIdAuto(listaDati, IDcercato);
-            if (IDtrovato!=-1) 
+            if (IDtrovato!=-1)
                 cancellaRimborso(listaDati, IDtrovato, modDaSalvare);
             else
                 std::cout << "[!] ID non presente\n";
@@ -191,7 +192,7 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare) {
     do {
         std::cout << "Targa auto (7 caratteri): ";
         std::cin >> buffer_string;
-    } while (buffer_string.size() != CARATTERI_TARGA);  
+    } while (buffer_string.size() != CARATTERI_TARGA || !convalida_targa(buffer_string));
 
     // Gestione del caso in cui la targa inserita sia già presente tra i dati
     indiceAutoPresente = ricercaTarga(listaDati, buffer_string);
@@ -204,7 +205,7 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare) {
         if (buffer_char == 'i' || buffer_char == 'I')
             return;
         else {
-            /* Se l'utente vuole sovrascrivere un rimborso lo tengo a mente in una variabile e la utilizzo 
+            /* Se l'utente vuole sovrascrivere un rimborso lo tengo a mente in una variabile e la utilizzo
             alla fine della funzione per salvare tutto su un rimborso già esistente */
             sovrascrittura = true;
             std::cout << "Verrà sovrascritto il rimborso dell'auto di targa " << buffer_string << "\n\n";
@@ -274,7 +275,7 @@ int ricercaTarga(std::vector<datiRimborso> listaDati, std::string targaRicercata
         if (targaRicercata.compare(listaDati[i].targa_Auto) == 0)
             return i;
     }
-    return -1; 
+    return -1;
 }
 
 void ordinamentoDati(std::vector<datiRimborso>& listaDati) {
@@ -322,7 +323,7 @@ void caricamentoDati(std::vector<datiRimborso>& listaDati, std::fstream& inputFi
     while (!inputFile.eof())
     {
         getline(inputFile, tempStr, ';');
-        /* Dopo aver preso i valori dell'ultima riga, il ciclo si ripete un'ultima volta. Controllo se ho raggiunto l'EOF dopo aver preso il primo dato, 
+        /* Dopo aver preso i valori dell'ultima riga, il ciclo si ripete un'ultima volta. Controllo se ho raggiunto l'EOF dopo aver preso il primo dato,
         in modo da interrompermi se mi trovo in quel caso, così evito di avere un rimborso "sporco" come ultimo rimborso nella listaDati */
         if (inputFile.eof())
             break;
@@ -404,10 +405,10 @@ int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato) //
         if (listaDati[i].idAuto == idRicercato)
             return i;
     }
-    return -1; 
+    return -1;
 }
 
-void ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato, std::vector<int> &IdPersonaTrovati) 
+void ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato, std::vector<int> &IdPersonaTrovati)
 //ricerca secondo IDPersona. Gli indici in cui viene trovato l'ID vengono salvati nel vettore IdPersonaTrovati
 {
     int vectSize = listaDati.size();
@@ -494,7 +495,7 @@ void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID) //
         std::cout << "|" << listaDati[pos_ID].des_auto << "\t" << std::endl;
 }
 
-void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati, std::vector<int> &IdPersonaTrovati) 
+void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati, std::vector<int> &IdPersonaTrovati)
 // funzione che mostra tutti i dati inerenti all'ID persona cercato (anche multipli rimborsi)
 {
     std::cout << "\n|ID PERSONA\t|ID AUTO\t|TARGA\t\t|COSTO(Euro/Km)\t|KM AUTO\t|MESE\t|ANNO\t|DESCRIZIONE AUTO\n" <<
@@ -521,11 +522,29 @@ void cancellaRimborso(std::vector<datiRimborso> &listaDati, const int idDaElimin
     /* Questa funzione elimina dal vettore listaDati il rimborso che ha come idAuto idDaEliminare. Modifica, inoltre,
     la variabile modDaSalvare, in maniera che il prossimo menu avvisi l'utente che ci sono delle modifiche non salvate nel file */
     int vectSize;
-    
+
     vectSize = listaDati.size();
     for (int i = idDaEliminare; i < vectSize; i++) {
         listaDati[i] = listaDati[i+1];
     }
     listaDati.pop_back();
     modDaSalvare = true;
+}
+
+bool convalida_targa(const std::string targa)      //questa funzione serve per verificare che la targa sia conforme alle norme europee
+{
+    const int dim_targa=7;                          // definisco la dimensione della targa
+    for(int i=0;i<dim_targa;i++)
+    {
+        if(i<2 || i>4)                              /*verifico che i primi 2 caratteri e gli ultimi 2
+                                                        non siano delle lettere tornado false, perché quei caratteri devono essere lettere maiuscole*/
+            if(targa[i]<65 || targa[i]>90)
+                return false;
+
+        if(i>=2&&i<=4)                              /*verifico che i tre caratteri di mezzo non siano numeri, tornando false
+                                                        se l'esito è positivo, perché i caratteri di mezzo devono essere numeri*/
+            if(targa[i]<48 || targa[i]>57)
+                return false;
+    }
+    return true;                                    // se le condizioni mi danno esito negativo tornerà true, perché la convalidazione della sarà adeguata
 }
