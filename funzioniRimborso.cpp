@@ -26,7 +26,7 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare);
 int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato);
 void ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato, std::vector<int> &IdPersonaTrovati);
 int ricercaTarga(std::vector<datiRimborso> listaDati, std::string targaRicercata);
-void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati);
+void mostramenu();
 void mostraDati(std::vector<datiRimborso> listaDati);
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
 void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati, std::vector<int> &IdPersonaTrovati) ;
@@ -34,15 +34,30 @@ void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);
 void cancellaRimborso(std::vector<datiRimborso>& listaDati, const int idDaEliminare, bool &modDaSalvare);
 bool convalida_targa(const std::string targa);
 
-void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati) {
+void mostramenu() {
     // Funzione principale del software, mostra all'utente le scelte possibili e raccoglie gli input necessari. La scelta 7 chiude il programma
 
-    unsigned int scelta;
+    unsigned int sceltaMenu;
     unsigned int IDcercato;
     unsigned int IDtrovato;
     std::vector<int> IdPersonaTrovati;
     bool modDaSalvare = false;
     bool fineProgramma = false;
+    char sceltaSalvataggio;
+
+    // Apertura file dati
+    std::fstream fileDati("DATIRIMBORSO.csv", std::fstream::in);
+
+    // Controllo che l'apertura sia andata a buon fine
+    if (fileDati.fail()) {
+        std::cout << "Lettura del file \"DATIRIMBORSO.csv\" fallita. Verificare che esso sia presente" << std::endl;
+        return;
+    }
+
+    // Creazione vector dati e caricamento da file
+    std::vector<datiRimborso> listaDati;
+    caricamentoDati(listaDati, fileDati);
+
     while (true) {
 
         std::cout << "\n\n\t\t------RIMBORSO AUTO------\n";
@@ -53,16 +68,14 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati) {
         std::cout << "\t [4]  Rimuovere un rimborso presente nel database dei rimborsi\n";
         std::cout << "\t [5]  Mostrare i rimborsi presenti nel database dei rimborsi\n";
         std::cout << "\t [6]  Salvataggio modifiche";
-        if (modDaSalvare)
-            std::cout << "  [RILEVATE MODIFICHE NON SALVATE]";
         std::cout << "\n\t [7]  ESC\n";
 
         do {
             std::cout << "\n n scelta: ";
-            std::cin >> scelta;
-        } while (scelta < 1 || scelta > 7);
+            std::cin >> sceltaMenu;
+        } while (sceltaMenu < 1 || sceltaMenu > 7);
 
-        switch(scelta)
+        switch(sceltaMenu)
         {
         case 1:
             inserimentoDati(listaDati, modDaSalvare);
@@ -106,12 +119,18 @@ void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati) {
             fileDati.open("DATIRIMBORSO.csv", std::fstream::in);
             break;
         case 7:
-            return;
             fineProgramma = true;
         }
         system("pause");
         system("cls");
         if (fineProgramma) {
+            do {
+                std::cout << "[!] Ci sono delle modifiche non salvate! Salvarle nel file? (s/n): ";
+                std::cin >> sceltaSalvataggio;
+            } while (sceltaSalvataggio != 's' && sceltaSalvataggio != 'S' && sceltaSalvataggio != 'n' && sceltaSalvataggio != 'N');
+            if (sceltaSalvataggio == 's' || sceltaSalvataggio == 'S')
+                salvaDati(listaDati, fileDati);
+            fileDati.close();
             break;
         }
     }
@@ -147,6 +166,7 @@ void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati) {
     // Questa funzione salva i dati presenti nel vettore listaDati nel file di database
 
     int vectLength = listaDati.size();
+    int saveCount = 0;
     for (int i = 0; i < vectLength; i++) {
         fileDati << listaDati[i].idPersona << ";";
         fileDati << listaDati[i].idAuto << ";";
@@ -156,6 +176,7 @@ void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati) {
         fileDati << listaDati[i].MeseRimb << ";";
         fileDati << listaDati[i].km_rimborso << ";";
         fileDati << listaDati[i].des_auto << "\n";
+        saveCount++;
     }
 }
 

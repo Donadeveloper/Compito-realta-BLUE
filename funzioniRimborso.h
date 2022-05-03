@@ -24,7 +24,7 @@ void inserimentoDati(std::vector<datiRimborso>& listaDati, bool &modDaSalvare);
 int ricercaIdAuto(std::vector<datiRimborso> listaDati, const int idRicercato);
 void ricercaIdPersona(std::vector<datiRimborso> listaDati, const int idRicercato, std::vector<int> &IdPersonaTrovati);
 int ricercaTarga(std::vector<datiRimborso> listaDati, std::string targaRicercata);
-void mostramenu(std::vector<datiRimborso> listaDati, std::fstream &fileDati);
+void mostramenu();
 void mostraDati(std::vector<datiRimborso> listaDati);
 void mostra_per_IDAuto(std::vector<datiRimborso>& listaDati,const int pos_ID);
 void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati, std::vector<int> &IdPersonaTrovati) ;
