@@ -32,7 +32,9 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="main.cpp" />
+		<Unit filename="Rimborsi_Auto_main.cpp" />
+		<Unit filename="funzioniRimborso.cpp" />
+		<Unit filename="funzioniRimborso.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

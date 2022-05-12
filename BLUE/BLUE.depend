@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1652363814 source:c:\users\manu\desktop\3bia\blue\compito-realta-blue\blue\rimborsi_auto_main.cpp
+	<iostream>
+	<string>
+	<vector>
+	<fstream>
+	<locale>
+	"funzioniRimborso.h"
+
+1652363814 c:\users\manu\desktop\3bia\blue\compito-realta-blue\blue\funzionirimborso.h
+	<iostream>
+	<string>
+	<vector>
+	<fstream>
+

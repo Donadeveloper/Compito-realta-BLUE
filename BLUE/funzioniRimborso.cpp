@@ -3,7 +3,9 @@
 #include <vector>
 #include <fstream>
 #include <locale>
+#include "funzioniRimborso.h"
 
+/*
 struct datiRimborso {
 
     int idAuto;
@@ -33,7 +35,7 @@ void mostra_per_IDPersona(std::vector<datiRimborso>& listaDati, std::vector<int>
 void salvaDati(std::vector<datiRimborso> &listaDati, std::fstream &fileDati);
 void cancellaRimborso(std::vector<datiRimborso>& listaDati, const int idDaEliminare, bool &modDaSalvare);
 bool convalida_targa(const std::string targa);
-
+*/
 void mostramenu() {
     // Funzione principale del software, mostra all'utente le scelte possibili e raccoglie gli input necessari. La scelta 7 chiude il programma
 
